@@ -1,0 +1,40 @@
+# Changelog
+
+## [v0.0.2]
+
+### Added
+- **Docker Support**:
+  - Added a `Dockerfile` to easily build and run the application as a container.
+  - Configured **multi-architecture (`amd64`, `arm64`)** support using `docker buildx`.
+  - Integrated **GitHub Actions** to automatically build and publish Docker images to **GitHub Container Registry (GHCR)**.
+
+### Changed
+- **CI/CD Enhancements**:
+  - Improved GitHub Actions workflow to include **multi-arch Docker image builds**.
+  - Simplified Docker image creation using `build-context` for different architectures.
+
+---
+
+## [v0.0.1]
+
+### Added
+- **Cobra CLI Integration**:
+  - Migrated from the `flag` package to `cobra` for better CLI management.
+  - Added shorthand flags (e.g., `-w` for `--ws`).
+- **Resource Management**:
+  - Added a cleanup mechanism to remove inactive agents after 5 minutes of inactivity.
+  - Improved handling of WebSocket and UDP connection closures to prevent resource leaks.
+- **Logging Enhancements**:
+  - Added options to log exchanges (`--log-exchanges`) and new connections (`--log-new-conn`).
+  - Added an option to print hex dumps of packets (`--hexdump`).
+
+### Changed
+- **Code Structure**:
+  - Refactored the code to use `cobra.Command` for better organization.
+  - Improved error handling and logging across the codebase.
+- **Agent Management**:
+  - Added a mutex (`sync.Mutex`) to ensure thread-safe access to agent data.
+
+### Fixed
+- **Memory Leaks**:
+  - Fixed an issue where agents were not being cleaned up, leading to resource exhaustion.

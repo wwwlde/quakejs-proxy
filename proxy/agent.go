@@ -4,18 +4,27 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net"
+	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
-type agent struct {
-	sock *net.UDPConn
-	ws   *websocket.Conn
-	addr *net.UDPAddr
+// var (
+// 	logExchanges      = true
+// 	hexdumpPackets    = true
+// 	logNewConnections = true
+// )
 
-	running bool
-	udpData chan []byte
+type agent struct {
+	sock         *net.UDPConn
+	ws           *websocket.Conn
+	addr         *net.UDPAddr
+	running      bool
+	udpData      chan []byte
+	lastActivity time.Time
+	mu           sync.Mutex
 }
 
 func (a *agent) ws2sock() {
@@ -24,8 +33,11 @@ func (a *agent) ws2sock() {
 		"func":   "ws2sock",
 	})
 	defer func() {
-		a.ws.Close()
+		a.mu.Lock()
 		a.running = false
+		a.ws.Close()
+		close(a.udpData)
+		a.mu.Unlock()
 	}()
 
 	for {
@@ -65,6 +77,10 @@ func (a *agent) ws2sock() {
 		if hexdumpPackets {
 			fmt.Println(hex.Dump(p))
 		}
+
+		a.mu.Lock()
+		a.lastActivity = time.Now()
+		a.mu.Unlock()
 	}
 }
 
@@ -75,8 +91,11 @@ func (a *agent) sock2ws() {
 	})
 
 	defer func() {
-		a.ws.Close()
+		a.mu.Lock()
 		a.running = false
+		a.ws.Close()
+		close(a.udpData)
+		a.mu.Unlock()
 	}()
 
 	for p := range a.udpData {
@@ -93,5 +112,9 @@ func (a *agent) sock2ws() {
 		if hexdumpPackets {
 			fmt.Println(hex.Dump(p))
 		}
+
+		a.mu.Lock()
+		a.lastActivity = time.Now()
+		a.mu.Unlock()
 	}
 }

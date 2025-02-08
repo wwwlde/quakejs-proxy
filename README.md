@@ -1,39 +1,61 @@
-# quakejs-proxy -- play on QuakeJS servers with a native ioquake3 client
+# QuakeJS-Proxy
+
+Play on QuakeJS servers with a native ioquake3 client.
 
 ## Description
 
-QuakeJS-Proxy is a Golang Quake 3 Arena proxy server which relays UDP packets from a [ioquake3](https://ioquake3.org) client to a [QuakeJS](https://github.com/inolen/quakejs) WebSocket server. It allows you to play on QuakeJS servers using a native ioquake3 client.
+QuakeJS-Proxy is a Golang proxy server that relays UDP packets from an [ioquake3](https://ioquake3.org) client to a [QuakeJS](https://github.com/inolen/quakejs) WebSocket server. It allows you to connect to QuakeJS servers using a native ioquake3 client, enabling the use of custom keybindings, configurations, and more.
 
-This means using your custom keybindings, custom config, etc.
+## Features
 
-## Building
+- **UDP to WebSocket Proxy**: Transforms UDP packets from the ioquake3 client into WebSocket messages for QuakeJS servers.
+- **Customizable Logging**: Options to log packet exchanges and new connections for debugging.
+- **Hexdump Support**: Print hex dumps of packets for advanced debugging.
 
-Clone the repository and run:
+## Installation
+
+Clone the repository and build the project:
 
 ```shell
 $ go build cmd/main.go
 ```
 
-This project was successfully tested with Go 1.15 and should work with all later versions.
+The project has been tested with Go 1.15 and should work with all later versions.
 
-## Running
+## Usage
 
-The only required parameter is:
-- `-ws`: the URI to the QuakeJS server, i.e. `quakejs.com:27960`
+Run the proxy with the following command:
 
-Optional parameters:
-- `-listen`: listen on a specific IP address. By default, it will listen on all available interfaces
-- `-log-exchanges`: useful when debugging, prints a log line every time a packet is exchanged through the proxy
-- `-hexdump`: useful when debugging, prints a hexdump of every packet going through the proxy
-- `-log-new-conn=false`: disable logging every new connection
+```shell
+$ ./quakejs-proxy --ws <quakejs-server-uri>
+```
 
-## Troubleshooting
+### Required Parameters
 
-**Connecting to the proxy server gives me "Game mismatch: this is a Quake 3 Arena server"**
+- `--ws` (or `-w`): The URI of the QuakeJS server (e.g., `quakejs.com:27960`).
 
-Make sure you are using an up-to-date build of ioquake3. The Windows build available on their website is old and doesn't support the new protocol used by QuakeJS. Instructions for building ioquake3 on a modern Windows are available in [BUILDING-IOQUAKE3.md](BUILDING-IOQUAKE3.md).
+### Optional Parameters
 
-**Connecting to the proxy server crashes the game on "Awaiting gamestate"**
+- `--listen` (or `-l`): Specify the IP address to listen on. Defaults to all available interfaces.
+- `--log-exchanges`: Log every packet exchange through the proxy (useful for debugging).
+- `--hexdump`: Print a hex dump of every packet (useful for debugging).
+- `--log-new-conn`: Enable or disable logging of new connections (default: `true`).
 
-Make sure your PK3 files match up with the server's. Most QuakeJS servers use Quake 3's demo files, and attempting to join with the full version will crash your game.
-See [GET-DEMO-PK3.md](GET-DEMO-PK3.md) for instructions on how to download the demo PK3 files from a QuakeJS server.
+### Example
+
+```shell
+$ ./quakejs-proxy --ws quakejs.com:27960 --listen 0.0.0.0:27960 --log-exchanges --hexdump
+```
+
+This will:
+- Connect to the QuakeJS server at `quakejs.com:27960`.
+- Listen for UDP connections on `0.0.0.0:27960`.
+- Log all packet exchanges and print hex dumps of packets.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+## License
+
+This project is open-source and available under the [MIT License](LICENSE).
